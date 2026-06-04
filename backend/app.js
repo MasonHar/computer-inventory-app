@@ -1,9 +1,6 @@
-// Why are we requiring these three? What are they for?
-// Express is the web framework for my backend, it creates the HTTP app, handles routes, middleware, and JSON request/response handling
-// Cors is for telling the browser that the API is allowed to accept requests from the frontend
-// dotenv will load config/secrets from .env into preocess.env
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const computerRoutes = require('./routes/computerRoutes');
@@ -20,5 +17,13 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/computers', computerRoutes);
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  app.get('/*splat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
 module.exports = app;
